@@ -7,7 +7,7 @@ exports.allDates = (req,res) => {
     console.log(req.body)
     TabDate.find({
         $and : [
-            {date : {$gt : req.body.dateDebut}},
+            {date : {$gte : req.body.dateDebut}},
             {date : {$lte : req.body.dateFin}},
         ]
     })
@@ -21,19 +21,36 @@ exports.newDate = async (req,res) => {
     const fin = new Date(req.body.fin)
 
     let err = false
-    while(debut < fin){
+    while(debut <= fin){
         try {
             let weekend = false
+            let heureOuverture = 5
+
             if (debut.getDay() === 6 || debut.getDay() === 0){
                 weekend = true
             }
-            console.log(debut.getDay())
-            await TabDate.updateOne({date : debut},{date : new Date(debut), weekend : weekend}, {upsert : true})
+            if (debut.getDay() === 0 || debut.getDay() === 6 || debut.getDay() === 3 ){
+                heureOuverture = 7
+            }
+            if (debut.getDay() === 1 ){
+                heureOuverture = 0
+            }
+
+            await TabDate.updateOne({date : debut},
+                {
+                    date : new Date(debut), 
+                    weekend : weekend,
+                    heureOuverture : heureOuverture,
+                    hauteSaison : false
+                },
+                {upsert : true}
+            )
+            debut.setDate(debut.getDate() + 1)
+
         } catch (error) {
             res.status(500).json(error)
             err = true
         }  
-        debut.setDate(debut.getDate() + 1)
     }
     if (err === false){
         console.log("salut")
@@ -51,4 +68,32 @@ exports.updatDates = async (req,res) => {
     }
 
     res.status(200).json({message : "salut la route"})
+}
+
+exports.hauteSaison = async (req, res) => {
+    const dateDebut = new Date(req.body.debut) 
+    const dateFin = new Date(req.body.fin)
+    const error = ""
+
+    while(dateDebut <= dateFin){
+        try {
+            await TabDate.updateOne({date : dateDebut},
+                {
+                    heureOuverture : 7,
+                    hauteSaison : true
+                },
+                {upsert : true}
+             )
+             dateDebut.setDate(dateDebut.getDate() + 1)
+
+        } catch (err) {
+            error = err
+        }
+    }
+
+    if (error){
+        res.status(500).json(error)
+    }else {
+        res.status(200).json({message : "Les dates ont bien été mis à jour"})
+    }
 }

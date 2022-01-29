@@ -8,10 +8,12 @@ h1{
     padding: 0px;
 }
 
+
+
 body{
     position: relative;
     max-width: 1200px;
     margin: auto;
     box-shadow: 0 0 15px 2px gray;
-
+    box-sizing: border-box;
 }

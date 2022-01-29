@@ -43,7 +43,7 @@ app.use(express.json()) // To parse the incoming requests with JSON payloads
 //***************************************
 let port = process.env.PORT;
 if (port == null || port == "") {
-  port = 3000;
+  port = 2000;
 }
 app.listen(port,()=>console.log("serveur écoute sur le port : " + port));
 

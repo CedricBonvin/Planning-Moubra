@@ -5,8 +5,9 @@ const jourSchema = mongoose.Schema({
   collab2 : {type : String, required : false},
   remarque : {type : String, required : false},
   date : {type : Date, required : true},
-  info : {type : String, required : false},
-  weekend : { type : Boolean, required : false, default : false}
+  heureOuverture : {type : Number, required : true, default : 5 },
+  weekend : { type : Boolean, required : false, default : false},
+  hauteSaison : { type : Boolean, required : false, default : false},
 })
 
 

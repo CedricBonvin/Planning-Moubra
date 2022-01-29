@@ -1,54 +1,112 @@
 <template>
     <main>
+        <modal-connection v-if="connect"/>
+
+        <!-- TITRE -->
         <div class="boxTitre">
             <h1>PLANNING</h1>
             <span class="span">...DE MALADE... </span>
         </div>
 
-        
-
-
-        <!-- AFFICHAGE -->
+        <!-- BASSE SAISON -->
         <div class="containerAffichage">
-            <p @click="displayCreerDates" class="creerDate"  >CRÉER DES NOUVELLES DATES DU PLANNING</p>
-            <div v-if="containerDates">
+            <p @click="displayCreerDates" class="creerDate"  >CRÉER BASSE SAISON</p>
+            <div class="boxBasseSaison" v-if="containerDates">
                 <label for="datedepart"> Date de départ : (2022/01/01)
                     <input id="datedepart" type="text">
                 </label>
                 <label for="dateFin"> Date de fin : (2022/01/01)
                     <input id="dateFin" type="text">
                 </label>
-                <button @click="injectDates" class="button validButton buttonAjouterDates">AJOUTER DATES</button>
+                <button @click="injecteBasseSaison" class="button validButton buttonAjouterDates">AJOUTER BASSE SAISON</button>
             </div>
         </div>
 
-        <!-- DATES -->
+        <!-- HAUTE SAISON -->
+        <section class="containerSaison">
+            <p @click="displayHauteSaison" class="titleSaison">CRÉER HAUTE SAISON</p>
+
+            <div v-if="afficheHauteSaison" class="boxSaison">
+                <div class="hauteSaison">
+                    <label for="debutHauteSaison">Début Haute saison ( 2022/01/01 ) </label>
+                    <input id="debutHauteSaison" type="text">
+
+                    <label for="finHauteSaison">Fin Haute saison ( 2022/04/15 ) </label>
+                    <input id="finHauteSaison" type="text">
+                </div>
+                <button @click="injecteHauteSaison" class="button validButton">AJOUTER HAUTE SAISON</button>
+            </div>
+        </section>
+
+        <!-- CHOICE DATES -->
         <h2>AFFICHAGE</h2>
         <div class="boxChoixDates">
             <div class="box">
-                <span>DE</span>
+                <span>DU</span>
                 <input id="dateDebut" type="text" >
             </div>
             <div class="box">
-                <span>À</span>
+                <span>AU</span>
                 <input id="dateDeFin" type="text" >
             </div>
             <div class="boxButton">
                 <button @click="choiceDate()" class="button validButton">AFFICHER LE PLANNING</button>
             </div>
         </div>
+
+        <!-- LEGENDE ET INFO -->
+        <div class="containerLegende">
+            <div class="boxLegendeCouleur">
+                <div class="couleurMiniature">
+                    <label>Haute Saison : </label>
+                    <div class="minHauteSaison"></div>
+                </div>
+                <div class="couleurMiniature">
+                    <label class="labelBasseSaison">Basse saison : </label>
+                    <div class="minBasseSaison"></div>
+                </div>
+            </div>
+            
+            <div class="boxCollaborateur">
+                <div class="collaborateur">
+                    <label for="all">Tout</label>
+                    <input  id="all" value="Tous" type="radio" v-model="collaborateur">
+                </div>
+                <div class="collaborateur">
+                    <label for="ludo">Ludo</label>
+                    <input  id="ludo" value="Ludo" type="radio" v-model="collaborateur"   >
+                </div>
+                <div class="collaborateur">
+                    <label for="yurj">Yurj</label>
+                    <input  id="yurj" value="Yurj" type="radio" v-model="collaborateur"   >
+                </div>
+                <div class="collaborateur">
+                    <label for="cedric">Cédric</label>
+                    <input  id="cedric" value="Cédric" type="radio" v-model="collaborateur"   >
+                </div>
+                <div class="collaborateur">
+                    <label for="cyp">Cyp</label>
+                    <input  id="cyp" value="Cyp" type="radio" v-model="collaborateur"   >
+                </div>
+            </div>
+            <div class="boxInfoHeure">
+                <p>TOTAL HEURES : <span class="total">{{ totalHeure}}</span></p>
+            </div>
+        </div>
+
+        <!-- AFFICHAGE DATES -->
         <div class="containerDates">
             <div class="headerDates">
                 <div class=" col headerDate">DATE</div>
-                <div class=" col headerDate">INFO</div>
+                <div class=" col colHeure headerDate">HEURE</div>
                 <div class=" col headerDate">COLLAB. 1</div>
                 <div class=" col headerDate">COLLAB. 2</div>
                 <div class=" col headerDate">REMARQUE</div>
             </div>
             <div v-for="item in allDate" :key="item._id">
-                <div :id="item._id" class="ligneDate" :class="item.weekend === true ? 'weekend' : 'noWeekend' " >
-                    <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" >
-                    <input @change="dateAModifier(item)" data-valeur="info" class="col change" type="text" disabled :value="item.info">
+                <div :id="item._id" class="ligneDate" >
+                    <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" :class="item.weekend === true ? 'weekend' : 'noWeekend' "  >
+                    <input class="col colHeure" type="text" disabled :value="item.heureOuverture" :class="item.hauteSaison ? 'hauteSaison' : 'basseSaison'">
                     <input @change="dateAModifier(item)" data-valeur="collab1" class="col change" type="text" disabled :value="item.collab1">
                     <input @change="dateAModifier(item)" data-valeur="collab2" class="col change" type="text" disabled :value="item.collab2">
                     <textarea @change="dateAModifier(item)" data-valeur="remarque" class="col change" type="text" disabled :value="item.remarque"></textarea>
@@ -65,16 +123,21 @@
 </template>
 
 <script>
+import modalConnection from '../components/modalConnection.vue'
 export default {
+  components: { modalConnection },
     name : "Home",
     data(){
         return{
             allDate : [],
+            connect : false,
             modifier : false,
             tabDatesChange : [],
             tabModifierDates : [],
             dateOption1 : {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
-            containerDates : false
+            containerDates : false,
+            afficheHauteSaison : false,
+            collaborateur : "Tous",
         }
     },
     methods : {
@@ -134,7 +197,7 @@ export default {
             })
             .catch(err => console.log(err))
         },
-        injectDates(){
+        injecteBasseSaison(){
             const dateDebut = document.getElementById("datedepart").value
             const dateFin = document.getElementById("dateFin").value
 
@@ -150,6 +213,24 @@ export default {
             })
             .then(res => res.json())
             .then(response => this.allDate = response)
+            .catch(err => console.log(err))
+        },
+        injecteHauteSaison(){
+            const debut = document.getElementById("debutHauteSaison").value
+            const fin = document.getElementById("finHauteSaison").value
+
+            const obj = {
+                debut : debut,
+                fin : fin
+            }
+
+            fetch(`${this.$store.state.HOST}/api/haute-saison`,{
+                method : "POST",
+                body : JSON.stringify(obj),
+                headers : {"content-type" : "application/json ; charset=UTF-8"}
+            })
+            .then(res => res.json())
+            .then(response => console.log(response))
             .catch(err => console.log(err))
         },
         clickModifier(){
@@ -192,7 +273,6 @@ export default {
                 idAModifier : item._id,
                 collab1 : parent.querySelector("[ data-valeur='collab1'] ").value,
                 collab2 : parent.querySelector("[ data-valeur='collab2'] ").value,
-                info : parent.querySelector("[ data-valeur='info'] ").value,
                 remarque : parent.querySelector("[ data-valeur='remarque'] ").value
             }
             // check si il existe déja dans le tableau
@@ -202,9 +282,7 @@ export default {
                    
                     // si il existe dans le tableau
                     if (date.idAModifier == item._id ){
-                        // date = {...obj}
                         this.tabModifierDates.splice(index,1,obj)
-                        // console.log(date)
                         existe = true
                     }
                 }
@@ -216,6 +294,47 @@ export default {
         },
         displayCreerDates(){
             this.containerDates ? this.containerDates = false : this.containerDates = true
+        },    
+        displayHauteSaison(){
+            this.afficheHauteSaison ? this.afficheHauteSaison = false : this.afficheHauteSaison = true
+        },
+    },
+    computed : {
+        totalHeure(){
+            let heure = 0
+            const collab = this.collaborateur
+            switch(collab){
+                case "Tous" : 
+                    for (let item of this.allDate){
+                        heure = heure + item.heureOuverture 
+                    }
+                    break;
+                 case "Yurj" : 
+                    for (let item of this.allDate){
+                        item.collab1 === "Yurj" ? heure = heure + item.heureOuverture : null
+                        item.collab2 === "Yurj" ? heure = heure + 5 : null
+                    }
+                    break;
+                case "Ludo" : 
+                    for (let item of this.allDate){
+                        item.collab1 === "Ludo" ? heure = heure + item.heureOuverture : null
+                        item.collab2 === "Ludo" ? heure = heure + 5 : null
+                    }
+                    break;
+                case "Cédric" : 
+                    for (let item of this.allDate){
+                        item.collab1 === "Cédric" ? heure = heure + item.heureOuverture : null
+                        item.collab2 === "Cédric" ? heure = heure + 5 : null
+                    }
+                    break;
+                case "Cyp" : 
+                    for (let item of this.allDate){
+                        item.collab1 === "Cyp" ? heure = heure + item.heureOuverture : null
+                        item.collab2 === "Cyp" ? heure = heure + 5 : null
+                    }
+                    break;
+            }
+            return heure
         }
     },
     mounted(){
@@ -238,7 +357,7 @@ export default {
             flex-flow: column;
             align-items: center;
             color: wheat;
-            background: black;  
+            background: teal;  
             padding: 20px 0;
         }
         .span{
@@ -303,6 +422,13 @@ export default {
         }
 
     }
+
+    .containerAffichage{
+        .boxBasseSaison{
+            margin-left: 50px;margin-bottom: 50px;
+
+        }
+    }
     
     .boxChoixDates{
         display: flex;
@@ -331,6 +457,65 @@ export default {
         }
     }
 
+    .containerLegende{
+        width: 90%;
+        margin: 20px auto;
+        margin-bottom: 0;
+
+        .boxLegendeCouleur{
+           display: flex;
+           margin-bottom: 10px;
+
+           .couleurMiniature{
+               display: flex;
+               align-items: center;
+           }
+           .labelBasseSaison{
+               margin-left: 50px;
+           } 
+        }
+
+        .minHauteSaison{
+            width: 50px;
+            height: 15px;
+            background: rgb(173, 173, 211);
+            margin-left: 10px;
+        }
+        .minBasseSaison{
+            width: 50px;
+            height: 15px;
+            background: rgb(176, 206, 176);
+            margin-left: 10px;
+        }
+        .boxInfoHeure{
+            margin: 20px 0;
+        }
+        .total{
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .collaborateur{
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        input{
+            margin-left: 10px;
+        }
+        .boxCollaborateur{
+            display: flex;
+            justify-content: space-evenly;
+            flex-flow: wrap;
+            margin-top: 0px;
+
+            padding: 10px 0;
+            background: lightgray;
+            label{
+                font-weight: bold;
+            }
+        }
+    }
+
     .containerDates{
         width: 90%;
         margin: auto;
@@ -343,7 +528,7 @@ export default {
             cursor: pointer;
         }
         .col{
-            width: 20%;
+            width: 23%;
         }
         .headerDates{
             display: flex;
@@ -374,9 +559,40 @@ export default {
         .possibleChange{
             background: rgb(209, 162, 162);
         }
+        .hauteSaison{
+            background: rgb(173, 173, 211);
+        }
+        .basseSaison{
+            background: rgb(176, 206, 176);
+        }
+        .colHeure{
+            width: 8%;
+            text-align: center;
+            padding-left: 0;
+        }
     }
 
-   
+    .containerSaison{
+        margin-left: 50px;
+
+        .titleSaison{
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .titleSaison:hover{
+            color: gray;
+        }
+        .boxSaison{
+            margin-left: 50px;
+        }
+        .hauteSaison{
+            margin-top: 20px;
+        }
+        button{
+            margin: 20px 0;
+        }
+    }
+
 
     @media screen and (max-width : 500px){
         main{
@@ -391,10 +607,8 @@ export default {
             }  
             input, textarea{
                 font-size: 8px;
-                padding: 5px
-                
+                padding: 5px           
             }
-
          }
     }
 </style>
