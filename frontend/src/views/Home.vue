@@ -50,7 +50,7 @@
                 <input id="dateDeFin" type="text" >
             </div>
             <div class="boxButton">
-                <button @click="choiceDate()" class="button validButton">AFFICHER LE PLANNING</button>
+                <button @click="callDate()" class="button validButton">AFFICHER LE PLANNING</button>
             </div>
         </div>
 
@@ -69,26 +69,27 @@
             
             <div class="boxCollaborateur">
                 <div class="collaborateur">
-                    <label for="all">Tout</label>
-                    <input  id="all" value="Tous" type="radio" v-model="collaborateur">
+                    <label class="etoile" for="all">Tout</label>
+                    <input @change="callDate"   id="all" value="Tous" type="radio" v-model="collaborateur">
                 </div>
                 <div class="collaborateur">
                     <label for="ludo">Ludo</label>
-                    <input  id="ludo" value="Ludo" type="radio" v-model="collaborateur"   >
+                    <input @change="callDate"  id="ludo" value="Ludo" type="radio" v-model="collaborateur"   >
                 </div>
                 <div class="collaborateur">
                     <label for="yurj">Yurj</label>
-                    <input  id="yurj" value="Yurj" type="radio" v-model="collaborateur"   >
+                    <input @change="callDate"  id="yurj" value="Yurj" type="radio" v-model="collaborateur"   >
                 </div>
                 <div class="collaborateur">
                     <label for="cedric">Cédric</label>
-                    <input  id="cedric" value="Cédric" type="radio" v-model="collaborateur"   >
+                    <input @change="callDate"  id="cedric" value="Cédric" type="radio" v-model="collaborateur"   >
                 </div>
                 <div class="collaborateur">
                     <label for="cyp">Cyp</label>
-                    <input  id="cyp" value="Cyp" type="radio" v-model="collaborateur"   >
+                    <input @change="callDate"  id="cyp" value="Cyp" type="radio" v-model="collaborateur"   >
                 </div>
             </div>
+            <p class="redInfo">Tout = Total heure d'ouverture de la salle (sans collab_2)</p>
             <div class="boxInfoHeure">
                 <p>TOTAL HEURES : <span class="total">{{ totalHeure}}</span></p>
             </div>
@@ -141,46 +142,22 @@ export default {
         }
     },
     methods : {
-        callDate(){
+        DefaultDate(){
             const dateNow = new Date(Date.now())
-            const dateDebutString = dateNow.toLocaleDateString()
-            const dateDebutDate = dateDebutString.split("/").reverse().join("/")
+            const dateFin = new Date( dateNow.setMonth(dateNow.getMonth() + 3)) 
 
-            const dateFin = new Date(Date.now())
-            dateFin.setMonth(dateNow.getMonth() + 2) 
-            const dateFinString = dateFin.toLocaleDateString()
-            const dateFinalFin =  dateFinString.split("/").reverse().join("/")
-
-            document.getElementById("dateDebut").value = dateDebutDate
-            document.getElementById("dateDeFin").value = dateFinalFin
-
-            const obj = {
-                dateDebut : new Date(dateDebutDate) ,
-                dateFin : new Date(dateFinalFin) 
-            }
-            
-            fetch(`${this.$store.state.HOST}/api/allDates`,{
-                method : "POST",
-                body : JSON.stringify(obj),
-                headers : {"content-type" : "application/json ; charset=UTF-8"}
-            })
-            .then(res => res.json())
-            .then(response => {
-                response.sort(function(a,b){
-                    return new Date(b.date) - new Date(a.date);
-                });
-                this.allDate = response.reverse()
-            })
-            .catch(err => console.log(err))
+            document.getElementById("dateDebut").value = new Date(Date.now()).toLocaleDateString()
+            document.getElementById("dateDeFin").value = dateFin.toLocaleDateString()
         },
-        choiceDate(){
-
-            const dateDebutDate = document.getElementById("dateDebut").value
-            const dateFinalFin = document.getElementById("dateDeFin").value
+        callDate(){
+           
+            const debut = document.getElementById("dateDebut").value.split("/").reverse().join("/")
+            const fin = document.getElementById("dateDeFin").value.split("/").reverse().join("/")
 
             const obj = {
-                dateDebut : new Date(dateDebutDate) ,
-                dateFin : new Date(dateFinalFin) 
+                dateDebut : new Date(debut),
+                dateFin : new Date(fin),
+                collaborateur : this.collaborateur
             }
             
             fetch(`${this.$store.state.HOST}/api/allDates`,{
@@ -264,7 +241,7 @@ export default {
                 headers : {"content-type" : "application/json ; charset=UTF-8"}
             })
             .then(res => res.json())
-            .then(() => this.choiceDate())
+            .then(() => this.callDate())
             .catch(err => console.log(err))
         },
         dateAModifier(item){
@@ -300,11 +277,12 @@ export default {
         },
     },
     computed : {
-        totalHeure(){
+        totalHeure (){
             let heure = 0
             const collab = this.collaborateur
             switch(collab){
                 case "Tous" : 
+                    
                     for (let item of this.allDate){
                         heure = heure + item.heureOuverture 
                     }
@@ -338,6 +316,7 @@ export default {
         }
     },
     mounted(){
+        this.DefaultDate()
         this.callDate()
     }
 
@@ -461,6 +440,16 @@ export default {
         width: 90%;
         margin: 20px auto;
         margin-bottom: 0;
+
+        .redInfo:before, .etoile::before{
+            content: "*";
+            color: rgb(177, 34, 34);;
+        }
+        .redInfo{
+            color: rgb(177, 34, 34);
+            font-style: italic;
+            font-size: 14px !important;
+        }
 
         .boxLegendeCouleur{
            display: flex;
@@ -609,6 +598,29 @@ export default {
                 font-size: 8px;
                 padding: 5px           
             }
+         }
+         .containerSaison{
+             margin-left: 10px;
+         }
+        
+    
+
+         @media  screen and (max-width : 410px) {
+            .labelBasseSaison{
+                 margin-left: 0 !important;
+            }
+             .couleurMiniature{
+                display: flex;
+                flex-flow: column;
+            
+             }
+             .boxLegendeCouleur{
+                 display: flex;
+                 justify-content: space-evenly;
+             }
+             .minBasseSaison, .minHauteSaison{
+                 margin-left: 0 !important;
+             }
          }
     }
 </style>

@@ -3,16 +3,31 @@ const TabDate = require("../model/model-Jour")
 
 
 exports.allDates = (req,res) => {
-
     console.log(req.body)
-    TabDate.find({
-        $and : [
-            {date : {$gte : req.body.dateDebut}},
-            {date : {$lte : req.body.dateFin}},
-        ]
-    })
-    .then(response => res.status(200).json(response) )
-    .catch(err => res.status(401).json(err))   
+    if (req.body.collaborateur === "Tous"){
+        TabDate.find({
+            $and : [
+                {date : {$gte : req.body.dateDebut}},
+                {date : {$lte : req.body.dateFin}},
+            ]
+        })
+        .then(response => res.status(200).json(response) )
+        .catch(err => res.status(401).json(err))   
+    } else {
+        
+        TabDate.find({
+            $and : [
+                {date : {$gte : req.body.dateDebut}},
+                {date : {$lte : req.body.dateFin}},
+                {$or : [
+                    {collab1 : req.body.collaborateur},
+                    {collab2 : req.body.collaborateur}
+                ]}
+            ]
+        })
+        .then(response => res.status(200).json(response) )
+        .catch(err => res.status(401).json(err))
+    }
 }
 
 exports.newDate = async (req,res) => {
