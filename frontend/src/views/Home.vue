@@ -92,6 +92,26 @@
             <p class="redInfo">Tout = Total heure d'ouverture de la salle (sans collab_2)</p>
             <div class="boxInfoHeure">
                 <p>TOTAL HEURES : <span class="total">{{ totalHeure}}</span></p>
+
+                <span @click="detail" class="detail">Détail</span>
+                <div v-if="displayDetail" class="containerDetail">
+                    <div>
+                        <p v-if="heureMois.janvier">Janvier : {{heureMois.janvier}} heures </p>
+                        <p v-if="heureMois.fevrier">Février : {{heureMois.fevrier}} heures </p>
+                        <p v-if="heureMois.mars">Mars : {{heureMois.mars}} heures</p>
+                        <p v-if="heureMois.avril">Avril : {{heureMois.avril}} heures</p>
+                        <p v-if="heureMois.mai">Mai : {{heureMois.mai}} heures </p>
+                        <p v-if="heureMois.juin">Juin : {{heureMois.juin}} heures </p>
+                    </div>
+                    <div>
+                        <p v-if="heureMois.juillet">Juillet : {{heureMois.juillet}} heures </p>
+                        <p v-if="heureMois.aout">Aout : {{heureMois.aout}} heures </p>
+                        <p v-if="heureMois.septembre">Septembre : {{heureMois.septembre}} heures </p>
+                        <p v-if="heureMois.octobre">Octobre : {{heureMois.octobre}} heures </p>
+                        <p v-if="heureMois.novembre">Novembre : {{heureMois.novembre}} heures </p>
+                        <p v-if="heureMois.decembre">Décembre : {{heureMois.decembre}} heures </p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -139,6 +159,21 @@ export default {
             containerDates : false,
             afficheHauteSaison : false,
             collaborateur : "Tous",
+            displayDetail : false,
+            heureMois : {
+                janvier : null,
+                fevrier : null,
+                mars : null,
+                avril : null,
+                mai : null,
+                juin : null,
+                juillet : null,
+                aout : null,
+                septembre : null,
+                octobre : null,
+                novembre : null,
+                decembre : null,
+            }
         }
     },
     methods : {
@@ -171,6 +206,7 @@ export default {
                     return new Date(b.date) - new Date(a.date);
                 });
                 this.allDate = response.reverse()
+                this.calculHeureMois()
             })
             .catch(err => console.log(err))
         },
@@ -275,6 +311,166 @@ export default {
         displayHauteSaison(){
             this.afficheHauteSaison ? this.afficheHauteSaison = false : this.afficheHauteSaison = true
         },
+        detail(){
+            this.displayDetail ? this.displayDetail = false : this.displayDetail = true
+        },
+        calculHeureMois(){
+            // réinitialisation 
+            for (let item in this.heureMois){
+                this.heureMois[item] = null
+            }
+            
+                // si collab = Tous
+            if(this.collaborateur === "Tous"){
+                for (let item of this.allDate){
+                    let mois = new Date(item.date).getMonth()
+                    mois === 0 ? this.heureMois.janvier += item.heureOuverture : null
+                    mois === 1 ? this.heureMois.fevrier += item.heureOuverture : null
+                    mois === 2 ? this.heureMois.mars += item.heureOuverture : null
+                    mois === 3 ? this.heureMois.avril += item.heureOuverture : null
+                    mois === 4 ? this.heureMois.mai += item.heureOuverture : null
+                    mois === 5 ? this.heureMois.juin += item.heureOuverture : null
+                    mois === 6 ? this.heureMois.juillet += item.heureOuverture : null
+                    mois === 7 ? this.heureMois.aout += item.heureOuverture : null
+                    mois === 8 ? this.heureMois.septembre += item.heureOuverture : null
+                    mois === 9 ? this.heureMois.octobre += item.heureOuverture : null
+                    mois === 10 ? this.heureMois.novembre += item.heureOuverture : null
+                    mois === 11? this.heureMois.decembre += item.heureOuverture : null
+                }
+            }
+            // si collab != Tous
+            
+            if (this.collaborateur === "Cédric"){
+                this.heureCollab(this.allDate, "Cédric")
+            }
+            if (this.collaborateur === "Yurj"){
+                this.heureCollab(this.allDate, "Yurj")
+            }
+            if (this.collaborateur === "Ludo"){
+                this.heureCollab(this.allDate, "Ludo")
+            }
+            if (this.collaborateur === "Cyp"){
+                this.heureCollab(this.allDate, "Cyp")
+            }                
+           
+        },
+        heureCollab(tab,nom){
+            for (let item of tab){
+                let mois = new Date(item.date).getMonth()
+
+                switch(mois){
+                    // janvier
+                    case 0 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.janvier += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.janvier += 5
+                        }
+                        break;
+                    // février
+                    case 1 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.fevrier += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.fevrier += 5
+                        }
+                        break;
+                    // mars
+                    case 2 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.mars += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.mars += 5
+                        }
+                        break;
+                    // avril
+                    case 3 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.avril += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.avril += 5
+                        }
+                        break;
+                    // mai
+                    case 4 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.mai += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.mai += 5
+                        }
+                        break;
+                    // juin
+                    case 5 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.juin += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.juin += 5
+                        }
+                        break;
+                    // juillet
+                    case 6 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.juillet += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.juillet += 5
+                        }
+                        break;
+                    // aout
+                    case 7 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.aout += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.aout += 5
+                        }
+                        break;
+                    // septembre
+                    case 8 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.septembre += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.septembre += 5
+                        }
+                        break;
+                    // octobre
+                    case 9 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.octobre += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.octobre += 5
+                        }
+                        break;
+                    // Novembre
+                    case 10 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.novembre += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.novembre += 5
+                        }
+                        break;
+                    // Décembre
+                    case 11 : 
+                        if (item.collab1 === nom) {
+                            this.heureMois.decembre += item.heureOuverture
+                        }
+                        if (item.collab2 === nom) {
+                            this.heureMois.decembre += 5
+                        }
+                        break;
+                }
+            }
+        }
+
     },
     computed : {
         totalHeure (){
@@ -450,6 +646,11 @@ export default {
             font-style: italic;
             font-size: 14px !important;
         }
+        .detail{
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
 
         .boxLegendeCouleur{
            display: flex;
@@ -478,6 +679,12 @@ export default {
         }
         .boxInfoHeure{
             margin: 20px 0;
+
+            .containerDetail{
+                display: flex;
+                justify-content: space-evenly;
+                flex-flow: wrap;
+            }
         }
         .total{
             font-weight: bold;
@@ -609,18 +816,18 @@ export default {
             .labelBasseSaison{
                  margin-left: 0 !important;
             }
-             .couleurMiniature{
+            .couleurMiniature{
                 display: flex;
                 flex-flow: column;
-            
-             }
-             .boxLegendeCouleur{
-                 display: flex;
-                 justify-content: space-evenly;
-             }
-             .minBasseSaison, .minHauteSaison{
-                 margin-left: 0 !important;
-             }
+        
+            }
+            .boxLegendeCouleur{
+                display: flex;
+                justify-content: space-evenly;
+            }
+            .minBasseSaison, .minHauteSaison{
+                margin-left: 0 !important;
+            }
          }
     }
 </style>
