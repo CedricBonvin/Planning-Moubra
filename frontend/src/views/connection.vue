@@ -1,5 +1,6 @@
 <template>
     <section class="shadow">
+        <p v-if="this.$store.state.hack">test hack</p>
         <h2>CONNECTION</h2>
         <div class="boxInput">
             <label for="user">Utilisateur</label>
@@ -7,13 +8,45 @@
             <label for="password">Password</label>
             <input id="password" type="text">
         </div>
-        <button class="buttonConnection">CONNECTION</button>
+        <p v-if="this.$store.state.connection.error" class="error">{{this.$store.state.connection.error}}</p>
+        <button @click="tryConnection" class="buttonConnection">CONNECTION</button>
     </section>
 </template>
 
 <script>
 export default {
-    name : "modalConnection"
+    name : "modalConnection",
+    data(){
+        return{
+          
+        }
+    },
+    
+    methods : {
+        tryConnection(){
+
+            const obj = {
+                user : document.getElementById("user").value,
+                password :  document.getElementById("password").value,
+            }
+
+            fetch(`${this.$store.state.HOST}/user/connection`,{
+                method : "POST",
+                body :JSON.stringify(obj),
+                headers : {"content-type" : "application/json ; charset=UTF-8"}
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.token){
+                    localStorage.setItem("token" , JSON.stringify(response.token))
+                    this.$router.push({path : "/Home"})
+                }else {
+                    this.$store.state.connection.error = response.message
+                }
+            })
+            .catch(err => console.log(err))
+        }
+    }
 }
 </script>
 
@@ -21,12 +54,16 @@ export default {
     section{
         box-sizing: border-box !important;
     }
+    .error {
+        color: red;
+    }
     h2{
         display: inline-block;
         position: relative;
         padding: 0;
         margin: 0;
         text-align: left;
+        font-size: 25px;
     }
     h2:before{
         content: "";
@@ -75,5 +112,11 @@ export default {
     .boxInput{
           width: 200px;
           margin: 20px auto;
+    }
+
+    @media screen and (max-width : 500px){
+        section{
+            width: 80%;
+        }
     }
 </style>

@@ -1,157 +1,154 @@
 <template>
     <main>
-        <modal-connection v-if="connect"/>
+        <!-- loader -->
+        <div v-if="loading" class="lds-dual-ring"></div>
+    
+       
 
-        <!-- TITRE -->
-        <div class="boxTitre">
-            <h1>PLANNING</h1>
-            <span class="span">...DE MALADE... </span>
-        </div>
-
-        <!-- BASSE SAISON -->
-        <div class="containerAffichage">
-            <p @click="displayCreerDates" class="creerDate"  >CRÉER BASSE SAISON</p>
-            <div class="boxBasseSaison" v-if="containerDates">
-                <label for="datedepart"> Date de départ : (2022/01/01)
-                    <input id="datedepart" type="text">
-                </label>
-                <label for="dateFin"> Date de fin : (2022/01/01)
-                    <input id="dateFin" type="text">
-                </label>
-                <button @click="injecteBasseSaison" class="button validButton buttonAjouterDates">AJOUTER BASSE SAISON</button>
+        <div>
+            <!-- TITRE -->
+            <div class="boxTitre">
+                <h1>PLANNING</h1>
+                <span class="span">...DE MALADE... </span>
             </div>
-        </div>
-
-        <!-- HAUTE SAISON -->
-        <section class="containerSaison">
-            <p @click="displayHauteSaison" class="titleSaison">CRÉER HAUTE SAISON</p>
-
-            <div v-if="afficheHauteSaison" class="boxSaison">
-                <div class="hauteSaison">
-                    <label for="debutHauteSaison">Début Haute saison ( 2022/01/01 ) </label>
-                    <input id="debutHauteSaison" type="text">
-
-                    <label for="finHauteSaison">Fin Haute saison ( 2022/04/15 ) </label>
-                    <input id="finHauteSaison" type="text">
-                </div>
-                <button @click="injecteHauteSaison" class="button validButton">AJOUTER HAUTE SAISON</button>
-            </div>
-        </section>
-
-        <!-- CHOICE DATES -->
-        <h2>AFFICHAGE</h2>
-        <div class="boxChoixDates">
-            <div class="box">
-                <span>DU</span>
-                <input id="dateDebut" type="text" >
-            </div>
-            <div class="box">
-                <span>AU</span>
-                <input id="dateDeFin" type="text" >
-            </div>
-            <div class="boxButton">
-                <button @click="callDate()" class="button validButton">AFFICHER LE PLANNING</button>
-            </div>
-        </div>
-
-        <!-- LEGENDE ET INFO -->
-        <div class="containerLegende">
-            <div class="boxLegendeCouleur">
-                <div class="couleurMiniature">
-                    <label>Haute Saison : </label>
-                    <div class="minHauteSaison"></div>
-                </div>
-                <div class="couleurMiniature">
-                    <label class="labelBasseSaison">Basse saison : </label>
-                    <div class="minBasseSaison"></div>
+            <!-- BASSE SAISON -->
+            <div class="containerAffichage">
+                <p @click="displayCreerDates" class="creerDate"  >CRÉER BASSE SAISON</p>
+                <div class="boxBasseSaison" v-if="containerDates">
+                    <label for="datedepart"> Date de départ : (2022/01/01)
+                        <input id="datedepart" type="text">
+                    </label>
+                    <label for="dateFin"> Date de fin : (2022/01/01)
+                        <input id="dateFin" type="text">
+                    </label>
+                    <button @click="injecteBasseSaison" class="button validButton buttonAjouterDates">AJOUTER BASSE SAISON</button>
                 </div>
             </div>
+            <!-- HAUTE SAISON -->
+            <section class="containerSaison">
+                <p @click="displayHauteSaison" class="titleSaison">CRÉER HAUTE SAISON</p>
+                <div v-if="afficheHauteSaison" class="boxSaison">
+                    <div class="hauteSaison">
+                        <label for="debutHauteSaison">Début Haute saison ( 2022/01/01 ) </label>
+                        <input id="debutHauteSaison" type="text">
+                        <label for="finHauteSaison">Fin Haute saison ( 2022/04/15 ) </label>
+                        <input id="finHauteSaison" type="text">
+                    </div>
+                    <button @click="injecteHauteSaison" class="button validButton">AJOUTER HAUTE SAISON</button>
+                </div>
+            </section>
+            <!-- CHOICE DATES -->
+            <h2>AFFICHAGE</h2>
+            <div class="boxChoixDates">
+                <div class="box">
+                    <span>DU</span>
+                    <input id="dateDebut" type="text" >
+                </div>
+                <div class="box">
+                    <span>AU</span>
+                    <input id="dateDeFin" type="text" >
+                </div>
+                <div class="boxButton">
+                    <button @click="callDate()" class="button validButton">AFFICHER LE PLANNING</button>
+                </div>
+            </div>
+            <!-- LEGENDE ET INFO -->
+            <div class="containerLegende">
+                <div class="boxLegendeCouleur">
+                    <div class="couleurMiniature">
+                        <label>Haute Saison : </label>
+                        <div class="minHauteSaison"></div>
+                    </div>
+                    <div class="couleurMiniature">
+                        <label class="labelBasseSaison">Basse saison : </label>
+                        <div class="minBasseSaison"></div>
+                    </div>
+                </div>
             
-            <div class="boxCollaborateur">
-                <div class="collaborateur">
-                    <label class="etoile" for="all">Tout</label>
-                    <input @change="callDate"   id="all" value="Tous" type="radio" v-model="collaborateur">
-                </div>
-                <div class="collaborateur">
-                    <label for="ludo">Ludo</label>
-                    <input @change="callDate"  id="ludo" value="Ludo" type="radio" v-model="collaborateur"   >
-                </div>
-                <div class="collaborateur">
-                    <label for="yurj">Yurj</label>
-                    <input @change="callDate"  id="yurj" value="Yurj" type="radio" v-model="collaborateur"   >
-                </div>
-                <div class="collaborateur">
-                    <label for="cedric">Cédric</label>
-                    <input @change="callDate"  id="cedric" value="Cédric" type="radio" v-model="collaborateur"   >
-                </div>
-                <div class="collaborateur">
-                    <label for="cyp">Cyp</label>
-                    <input @change="callDate"  id="cyp" value="Cyp" type="radio" v-model="collaborateur"   >
-                </div>
-            </div>
-            <p class="redInfo">Tout = Total heure d'ouverture de la salle (sans collab_2)</p>
-            <div class="boxInfoHeure">
-                <p>TOTAL HEURES : <span class="total">{{ totalHeure}}</span></p>
-
-                <span @click="detail" class="detail">Détail</span>
-                <div v-if="displayDetail" class="containerDetail">
-                    <div>
-                        <p v-if="heureMois.janvier">Janvier : {{heureMois.janvier}} heures </p>
-                        <p v-if="heureMois.fevrier">Février : {{heureMois.fevrier}} heures </p>
-                        <p v-if="heureMois.mars">Mars : {{heureMois.mars}} heures</p>
-                        <p v-if="heureMois.avril">Avril : {{heureMois.avril}} heures</p>
-                        <p v-if="heureMois.mai">Mai : {{heureMois.mai}} heures </p>
-                        <p v-if="heureMois.juin">Juin : {{heureMois.juin}} heures </p>
+                <div class="boxCollaborateur">
+                    <div class="collaborateur">
+                        <label class="etoile" for="all">Tout</label>
+                        <input @change="callDate"   id="all" value="Tous" type="radio" v-model="collaborateur">
                     </div>
-                    <div>
-                        <p v-if="heureMois.juillet">Juillet : {{heureMois.juillet}} heures </p>
-                        <p v-if="heureMois.aout">Aout : {{heureMois.aout}} heures </p>
-                        <p v-if="heureMois.septembre">Septembre : {{heureMois.septembre}} heures </p>
-                        <p v-if="heureMois.octobre">Octobre : {{heureMois.octobre}} heures </p>
-                        <p v-if="heureMois.novembre">Novembre : {{heureMois.novembre}} heures </p>
-                        <p v-if="heureMois.decembre">Décembre : {{heureMois.decembre}} heures </p>
+                    <div class="collaborateur">
+                        <label for="ludo">Ludo</label>
+                        <input @change="callDate"  id="ludo" value="Ludo" type="radio" v-model="collaborateur"   >
+                    </div>
+                    <div class="collaborateur">
+                        <label for="yurj">Yurj</label>
+                        <input @change="callDate"  id="yurj" value="Yurj" type="radio" v-model="collaborateur"   >
+                    </div>
+                    <div class="collaborateur">
+                        <label for="cedric">Cédric</label>
+                        <input @change="callDate"  id="cedric" value="Cédric" type="radio" v-model="collaborateur"   >
+                    </div>
+                    <div class="collaborateur">
+                        <label for="cyp">Cyp</label>
+                        <input @change="callDate"  id="cyp" value="Cyp" type="radio" v-model="collaborateur"   >
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- AFFICHAGE DATES -->
-        <div class="containerDates">
-            <div class="headerDates">
-                <div class=" col headerDate">DATE</div>
-                <div class=" col colHeure headerDate">HEURE</div>
-                <div class=" col headerDate">COLLAB. 1</div>
-                <div class=" col headerDate">COLLAB. 2</div>
-                <div class=" col headerDate">REMARQUE</div>
-            </div>
-            <div v-for="item in allDate" :key="item._id">
-                <div :id="item._id" class="ligneDate" >
-                    <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" :class="item.weekend === true ? 'weekend' : 'noWeekend' "  >
-                    <input class="col colHeure" type="text" disabled :value="item.heureOuverture" :class="item.hauteSaison ? 'hauteSaison' : 'basseSaison'">
-                    <input @change="dateAModifier(item)" data-valeur="collab1" class="col change" type="text" disabled :value="item.collab1">
-                    <input @change="dateAModifier(item)" data-valeur="collab2" class="col change" type="text" disabled :value="item.collab2">
-                    <textarea @change="dateAModifier(item)" data-valeur="remarque" class="col change" type="text" disabled :value="item.remarque"></textarea>
+                <p class="redInfo">Tout = Total heure d'ouverture de la salle (sans collab_2)</p>
+                <div class="boxInfoHeure">
+                    <p>TOTAL HEURES : <span class="total">{{ totalHeure}}</span></p>
+                    <span @click="detail" class="detail">Détail</span>
+                    <div v-if="displayDetail" class="containerDetail">
+                        <div>
+                            <p v-if="heureMois.janvier">Janvier : {{heureMois.janvier}} heures </p>
+                            <p v-if="heureMois.fevrier">Février : {{heureMois.fevrier}} heures </p>
+                            <p v-if="heureMois.mars">Mars : {{heureMois.mars}} heures</p>
+                            <p v-if="heureMois.avril">Avril : {{heureMois.avril}} heures</p>
+                            <p v-if="heureMois.mai">Mai : {{heureMois.mai}} heures </p>
+                            <p v-if="heureMois.juin">Juin : {{heureMois.juin}} heures </p>
+                        </div>
+                        <div>
+                            <p v-if="heureMois.juillet">Juillet : {{heureMois.juillet}} heures </p>
+                            <p v-if="heureMois.aout">Aout : {{heureMois.aout}} heures </p>
+                            <p v-if="heureMois.septembre">Septembre : {{heureMois.septembre}} heures </p>
+                            <p v-if="heureMois.octobre">Octobre : {{heureMois.octobre}} heures </p>
+                            <p v-if="heureMois.novembre">Novembre : {{heureMois.novembre}} heures </p>
+                            <p v-if="heureMois.decembre">Décembre : {{heureMois.decembre}} heures </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="boxButtonUpdate">
-                <button @click="clickModifier" v-if="!modifier" class=" button validButton">MODIFIER</button>
-                <button @click="clickCancel" v-if="modifier" class=" button dangeButton">ANNULER</button>
-                <button @click="updatePlanning" v-if="modifier" class=" button validButton">VALIDER PLANNING</button>
+            <!-- AFFICHAGE DATES -->
+            <div class="containerDates">
+                <div class="headerDates">
+                    <div class=" col headerDate">DATE</div>
+                    <div class=" col colHeure headerDate">HEURE</div>
+                    <div class=" col headerDate">COLLAB. 1</div>
+                    <div class=" col headerDate">COLLAB. 2</div>
+                    <div class=" col headerDate">REMARQUE</div>
+                </div>
+                <div v-for="item in allDate" :key="item._id">
+                    <div :id="item._id" class="ligneDate" >
+                        <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" :class="item.weekend === true ? 'weekend' : 'noWeekend' "  >
+                        <input class="col colHeure" type="text" disabled :value="item.heureOuverture" :class="item.hauteSaison ? 'hauteSaison' : 'basseSaison'">
+                        <input @change="dateAModifier(item)" data-valeur="collab1" class="col change" type="text" disabled :value="item.collab1">
+                        <input @change="dateAModifier(item)" data-valeur="collab2" class="col change" type="text" disabled :value="item.collab2">
+                        <textarea @change="dateAModifier(item)" data-valeur="remarque" class="col change" type="text" disabled :value="item.remarque"></textarea>
+                    </div>
+                </div>
+                <div class="boxButtonUpdate">
+                    <button @click="clickModifier" v-if="!modifier" class=" button validButton">MODIFIER</button>
+                    <button @click="clickCancel" v-if="modifier" class=" button dangeButton">ANNULER</button>
+                    <button @click="updatePlanning" v-if="modifier" class=" button validButton">VALIDER PLANNING</button>
+                </div>
             </div>
         </div>
     </main>
 </template>
 
 <script>
-import modalConnection from '../components/modalConnection.vue'
 export default {
-  components: { modalConnection },
     name : "Home",
     data(){
         return{
             allDate : [],
-            connect : false,
+            connection : {
+                connect : false,
+                error : false,
+            },
             modifier : false,
             tabDatesChange : [],
             tabModifierDates : [],
@@ -173,11 +170,12 @@ export default {
                 octobre : null,
                 novembre : null,
                 decembre : null,
-            }
+            },
+            loading: false
         }
     },
     methods : {
-        DefaultDate(){
+        defaultDate(){
             const dateNow = new Date(Date.now())
             const dateFin = new Date( dateNow.setMonth(dateNow.getMonth() + 3)) 
 
@@ -185,11 +183,12 @@ export default {
             document.getElementById("dateDeFin").value = dateFin.toLocaleDateString()
         },
         callDate(){
-           
+           this.loading = true
             const debut = document.getElementById("dateDebut").value.split("/").reverse().join("/")
             const fin = document.getElementById("dateDeFin").value.split("/").reverse().join("/")
 
             const obj = {
+                token : localStorage.getItem("token"),
                 dateDebut : new Date(debut),
                 dateFin : new Date(fin),
                 collaborateur : this.collaborateur
@@ -207,32 +206,40 @@ export default {
                 });
                 this.allDate = response.reverse()
                 this.calculHeureMois()
+                this.loading = false
             })
             .catch(err => console.log(err))
         },
         injecteBasseSaison(){
+            this.loading = true
             const dateDebut = document.getElementById("datedepart").value
             const dateFin = document.getElementById("dateFin").value
 
             const obj = {
+                token : localStorage.getItem("token"),
                 debut : dateDebut,
                 fin : dateFin
                 }
 
-            fetch(`${this.$store.state.HOST}/api/putNewDate`, {
+            fetch(`${this.$store.state.HOST}/api/basse-saison`, {
                 method : "POST",
                 body: JSON.stringify(obj),
                 headers : {"content-type" : "application/json; charset=UTF-8"}
             })
             .then(res => res.json())
-            .then(response => this.allDate = response)
+            .then(response =>{
+                    this.allDate = response
+                    this.loading = false
+            }) 
             .catch(err => console.log(err))
         },
         injecteHauteSaison(){
+            this.loading = true
             const debut = document.getElementById("debutHauteSaison").value
             const fin = document.getElementById("finHauteSaison").value
 
             const obj = {
+                token : localStorage.getItem("token"),
                 debut : debut,
                 fin : fin
             }
@@ -243,7 +250,9 @@ export default {
                 headers : {"content-type" : "application/json ; charset=UTF-8"}
             })
             .then(res => res.json())
-            .then(response => console.log(response))
+            .then(() =>{
+                this.loading = false
+            })
             .catch(err => console.log(err))
         },
         clickModifier(){
@@ -269,7 +278,10 @@ export default {
                 item.classList.remove("possibleChange")
             }
 
-            const obj = { tabNewUpdate : this.tabModifierDates }
+            const obj = { 
+                tabNewUpdate : this.tabModifierDates,
+                token : localStorage.getItem("token")
+            }
 
             fetch(`${this.$store.state.HOST}/api/updateDates`,{
                 method : "POST",
@@ -303,7 +315,6 @@ export default {
                     this.tabModifierDates.push(obj)
                 }
             }else {this.tabModifierDates.push(obj)}
-             console.log(this.tabModifierDates)
         },
         displayCreerDates(){
             this.containerDates ? this.containerDates = false : this.containerDates = true
@@ -469,8 +480,29 @@ export default {
                         break;
                 }
             }
-        }
+        },
+        tryConnection(){
+            const token = localStorage.getItem("token")
+            if (token){
+                const obj = {
+                    token : token
+                }
+                fetch(`${this.$store.state.HOST}/try-connection`,{
+                    method : "POST",
+                    body : JSON.stringify(obj),
+                    headers : {"content-type" : "application/json ; charset=UTF-8"}
+                })
+                .then(res => {
+                    res.status != 200 ? this.$router.push({path : "/"}) : null
+                   return res.json()
+                })
+                .then(response => console.log(response))
+                .catch(err => console.log(err))
 
+            } else {
+                this.$router.push({path : "/"})
+            }
+        }
     },
     computed : {
         totalHeure (){
@@ -512,7 +544,8 @@ export default {
         }
     },
     mounted(){
-        this.DefaultDate()
+        this.tryConnection()
+        this.defaultDate()
         this.callDate()
     }
 

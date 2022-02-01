@@ -3,7 +3,6 @@ const TabDate = require("../model/model-Jour")
 
 
 exports.allDates = (req,res) => {
-    console.log(req.body)
     if (req.body.collaborateur === "Tous"){
         TabDate.find({
             $and : [
@@ -30,7 +29,7 @@ exports.allDates = (req,res) => {
     }
 }
 
-exports.newDate = async (req,res) => {
+exports.basseSaison = async (req,res) => {
 
     const debut = new Date(req.body.debut)
     const fin = new Date(req.body.fin)
@@ -68,7 +67,6 @@ exports.newDate = async (req,res) => {
         }  
     }
     if (err === false){
-        console.log("salut")
        await TabDate.find()
         .then(response => res.status(200).json(response) )
         .catch(err => res.status(401).json(err))   

@@ -8,6 +8,7 @@ require('dotenv').config();
 
 
  const routeSite = require("./router/mainRoute")
+ const routeUser = require("./router/userRoute")
 
 
 //***************************************
@@ -62,6 +63,7 @@ app.use(express.static(__dirname))
 
 
 app.use("/", routeSite)
+app.use("/", routeUser)
 // app.use("/", routeSite)
 
 
