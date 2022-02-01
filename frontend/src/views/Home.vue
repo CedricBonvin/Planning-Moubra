@@ -2,8 +2,6 @@
     <main>
         <!-- loader -->
         <div v-if="loading" class="lds-dual-ring"></div>
-    
-       
 
         <div>
             <!-- TITRE -->
@@ -296,10 +294,11 @@ export default {
             let parent = document.getElementById(item._id)
             let obj = {
                 idAModifier : item._id,
-                collab1 : parent.querySelector("[ data-valeur='collab1'] ").value,
-                collab2 : parent.querySelector("[ data-valeur='collab2'] ").value,
-                remarque : parent.querySelector("[ data-valeur='remarque'] ").value
+                collab1 : parent.querySelector("[ data-valeur='collab1'] ").value.split(" ").join(""),
+                collab2 : parent.querySelector("[ data-valeur='collab2'] ").value.split(" ").join(""),
+                remarque : parent.querySelector("[ data-valeur='remarque'] ").value.split(" ").join("")
             }
+         
             // check si il existe déja dans le tableau
             if ( this.tabModifierDates.length > 0){
                 let existe = false
