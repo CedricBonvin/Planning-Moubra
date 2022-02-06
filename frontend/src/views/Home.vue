@@ -115,13 +115,13 @@
                     <div class=" col headerDate">DATE</div>
                     <div class=" col colHeure headerDate">HEURE</div>
                     <div class=" col headerDate">COLLAB. 1</div>
-                    <div class=" col headerDate">COLLAB. 2</div>
+                    <div class=" col headerDate">COLLAB. 2 (4 h)</div>
                     <div class=" col headerDate">REMARQUE</div>
                 </div>
                 <div v-for="item in allDate" :key="item._id">
                     <div :id="item._id" class="ligneDate" >
-                        <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" :class="item.weekend === true ? 'weekend' : 'noWeekend' "  >
-                        <input class="col colHeure" type="text" disabled :value="item.heureOuverture" :class="item.hauteSaison ? 'hauteSaison' : 'basseSaison'">
+                        <input class="col" type="text" disabled :value="new Date(item.date).toLocaleDateString('fr-FR',dateOption1)" :class="[item.weekend === true ? 'weekend' : 'noWeekend', item.heureOuverture === 0 ? 'ferme' : null]"  >
+                        <input class="col colHeure" type="text" disabled :value="item.heureOuverture" :class="[item.hauteSaison ? 'hauteSaison' : 'basseSaison', item.heureOuverture === 0 ? 'ferme' : null]">
                         <input @change="dateAModifier(item)" data-valeur="collab1" class="col change" type="text" disabled :value="item.collab1">
                         <input @change="dateAModifier(item)" data-valeur="collab2" class="col change" type="text" disabled :value="item.collab2">
                         <textarea @change="dateAModifier(item)" data-valeur="remarque" class="col change" type="text" disabled :value="item.remarque"></textarea>
@@ -174,11 +174,15 @@ export default {
     },
     methods : {
         defaultDate(){
-            const dateNow = new Date(Date.now())
+            let dateNow = new Date(Date.now())
             const dateFin = new Date( dateNow.setMonth(dateNow.getMonth() + 3)) 
+            dateNow = new Date(Date.now())
 
-            document.getElementById("dateDebut").value = new Date(Date.now()).toLocaleDateString()
-            document.getElementById("dateDeFin").value = dateFin.toLocaleDateString()
+            const dateDeDebut =`${dateNow.getDate()}/${dateNow.getMonth() + 1}/${dateNow.getFullYear()}`
+            const dateDeFin =`${dateFin.getDate()}/${dateFin.getMonth() + 1}/${dateFin.getFullYear()}`
+
+            document.getElementById("dateDebut").value = dateDeDebut
+            document.getElementById("dateDeFin").value = dateDeFin
         },
         callDate(){
            this.loading = true
@@ -286,7 +290,10 @@ export default {
                 body : JSON.stringify(obj),
                 headers : {"content-type" : "application/json ; charset=UTF-8"}
             })
-            .then(res => res.json())
+            .then(res =>{
+                res.status === 301 ? window.location.href = "/" : null
+                return res.json()
+            } )
             .then(() => this.callDate())
             .catch(err => console.log(err))
         },
@@ -296,7 +303,7 @@ export default {
                 idAModifier : item._id,
                 collab1 : parent.querySelector("[ data-valeur='collab1'] ").value.split(" ").join(""),
                 collab2 : parent.querySelector("[ data-valeur='collab2'] ").value.split(" ").join(""),
-                remarque : parent.querySelector("[ data-valeur='remarque'] ").value.split(" ").join("")
+                remarque : parent.querySelector("[ data-valeur='remarque'] ").value
             }
          
             // check si il existe déja dans le tableau
@@ -375,7 +382,7 @@ export default {
                             this.heureMois.janvier += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.janvier += 5
+                            this.heureMois.janvier += 4
                         }
                         break;
                     // février
@@ -384,7 +391,7 @@ export default {
                             this.heureMois.fevrier += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.fevrier += 5
+                            this.heureMois.fevrier += 4
                         }
                         break;
                     // mars
@@ -393,7 +400,7 @@ export default {
                             this.heureMois.mars += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.mars += 5
+                            this.heureMois.mars += 4
                         }
                         break;
                     // avril
@@ -402,7 +409,7 @@ export default {
                             this.heureMois.avril += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.avril += 5
+                            this.heureMois.avril += 4
                         }
                         break;
                     // mai
@@ -411,7 +418,7 @@ export default {
                             this.heureMois.mai += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.mai += 5
+                            this.heureMois.mai += 4
                         }
                         break;
                     // juin
@@ -420,7 +427,7 @@ export default {
                             this.heureMois.juin += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.juin += 5
+                            this.heureMois.juin += 4
                         }
                         break;
                     // juillet
@@ -429,7 +436,7 @@ export default {
                             this.heureMois.juillet += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.juillet += 5
+                            this.heureMois.juillet += 4
                         }
                         break;
                     // aout
@@ -438,7 +445,7 @@ export default {
                             this.heureMois.aout += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.aout += 5
+                            this.heureMois.aout += 4
                         }
                         break;
                     // septembre
@@ -447,7 +454,7 @@ export default {
                             this.heureMois.septembre += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.septembre += 5
+                            this.heureMois.septembre += 4
                         }
                         break;
                     // octobre
@@ -456,7 +463,7 @@ export default {
                             this.heureMois.octobre += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.octobre += 5
+                            this.heureMois.octobre += 4
                         }
                         break;
                     // Novembre
@@ -465,7 +472,7 @@ export default {
                             this.heureMois.novembre += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.novembre += 5
+                            this.heureMois.novembre += 4
                         }
                         break;
                     // Décembre
@@ -474,7 +481,7 @@ export default {
                             this.heureMois.decembre += item.heureOuverture
                         }
                         if (item.collab2 === nom) {
-                            this.heureMois.decembre += 5
+                            this.heureMois.decembre += 4
                         }
                         break;
                 }
@@ -517,25 +524,25 @@ export default {
                  case "Yurj" : 
                     for (let item of this.allDate){
                         item.collab1 === "Yurj" ? heure = heure + item.heureOuverture : null
-                        item.collab2 === "Yurj" ? heure = heure + 5 : null
+                        item.collab2 === "Yurj" ? heure = heure + 4 : null
                     }
                     break;
                 case "Ludo" : 
                     for (let item of this.allDate){
                         item.collab1 === "Ludo" ? heure = heure + item.heureOuverture : null
-                        item.collab2 === "Ludo" ? heure = heure + 5 : null
+                        item.collab2 === "Ludo" ? heure = heure + 4 : null
                     }
                     break;
                 case "Cédric" : 
                     for (let item of this.allDate){
                         item.collab1 === "Cédric" ? heure = heure + item.heureOuverture : null
-                        item.collab2 === "Cédric" ? heure = heure + 5 : null
+                        item.collab2 === "Cédric" ? heure = heure + 4 : null
                     }
                     break;
                 case "Cyp" : 
                     for (let item of this.allDate){
                         item.collab1 === "Cyp" ? heure = heure + item.heureOuverture : null
-                        item.collab2 === "Cyp" ? heure = heure + 5 : null
+                        item.collab2 === "Cyp" ? heure = heure + 4 : null
                     }
                     break;
             }
@@ -543,6 +550,7 @@ export default {
         }
     },
     mounted(){
+        document.title = "planning"
         this.tryConnection()
         this.defaultDate()
         this.callDate()
@@ -797,6 +805,10 @@ export default {
             width: 8%;
             text-align: center;
             padding-left: 0;
+        }
+        .ferme{
+            background: rgb(139, 66, 66);
+            color: white;
         }
     }
 

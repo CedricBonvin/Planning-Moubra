@@ -9,9 +9,9 @@ exports.connection = async (req,res) => {
     if (user){
         if (user.password === req.body.password){
             const token = jwt.sign(
-                { user : user.password, password : user.password },
+                { user : user.user, password : user.password },
                 `${process.env.CLEF_TOKEN}`,
-                { expiresIn: '1h' }
+                // { expiresIn: '1m' }
                 )
             res.status(200).json({message : "utilisateur trouvé et password correct", token : token})
         }else{
@@ -23,11 +23,12 @@ exports.connection = async (req,res) => {
 }
 
 exports.tryConnection = async (req,res) => {
-    const token = JSON.parse(req.body.token)
-
+        console.log(req.body)
     try {
+        const token = JSON.parse(req.body.token)
         const decodedToken = jwt.verify(token, `${process.env.CLEF_TOKEN}`)
         const user = await User.findOne({user : decodedToken.user})
+        console.log(user)
         if (user){
             if (decodedToken.password === user.password){
                 res.status(200).json({message : "le token est valide"})
@@ -35,7 +36,7 @@ exports.tryConnection = async (req,res) => {
                 res.status(500).json({message : "token n'est plus valide"})
             }
         } else{
-            res.status(500).json({message : "token n'ai plus valide"})
+            res.status(500).json({message : "impossible de trouvé le user"})
         }
     } catch (error) {
         res.status(500).json(error)

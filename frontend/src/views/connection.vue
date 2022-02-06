@@ -6,10 +6,13 @@
             <label for="user">Utilisateur</label>
             <input id="user" type="text">
             <label for="password">Password</label>
-            <input id="password" type="text">
+            <input id="password" type="password">
         </div>
         <p v-if="this.$store.state.connection.error" class="error">{{this.$store.state.connection.error}}</p>
-        <button @click="tryConnection" class="buttonConnection">CONNECTION</button>
+        <button @click="tryConnection" class="buttonConnection">
+            <p v-if="!loading">CONNECTION</p>
+            <div v-if="loading" class="lds-dual-ring"></div>
+        </button>
     </section>
 </template>
 
@@ -18,13 +21,13 @@ export default {
     name : "modalConnection",
     data(){
         return{
-          
+            loading : false
         }
     },
     
     methods : {
         tryConnection(){
-
+            this.loading = true
             const obj = {
                 user : document.getElementById("user").value,
                 password :  document.getElementById("password").value,
@@ -37,6 +40,7 @@ export default {
             })
             .then(res => res.json())
             .then(response => {
+                this.loading = false
                 if (response.token){
                     localStorage.setItem("token" , JSON.stringify(response.token))
                     this.$router.push({path : "/Home"})
@@ -46,6 +50,9 @@ export default {
             })
             .catch(err => console.log(err))
         }
+    },
+    mounted(){
+        document.title = "connection"
     }
 }
 </script>
